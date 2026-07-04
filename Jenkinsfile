@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     tools {
-        jdk 'Java_22'          // Must match the JDK name in Jenkins Global Tool Configuration
-        maven 'Maven_3.9.9'      // Must match the Maven name in Jenkins Global Tool Configuration
+        jdk 'Java_22'
+        maven 'Maven_3.9.9'
     }
 
     stages {
@@ -35,7 +35,7 @@ pipeline {
 
         stage('Deploy to Nexus') {
             steps {
-                bat 'mvn deploy'
+                bat 'mvn -s C:\\Users\\likit\\.m2\\settings.xml clean deploy'
             }
         }
 
@@ -50,10 +50,19 @@ pipeline {
 
     post {
         success {
-            echo '✅ Build Successful!'
+            echo '======================================='
+            echo 'Build, Nexus Deployment and SonarQube Analysis Successful!'
+            echo '======================================='
         }
+
         failure {
-            echo '❌ Build Failed!'
+            echo '======================================='
+            echo 'Pipeline Failed! Check the Console Output.'
+            echo '======================================='
+        }
+
+        always {
+            echo 'Pipeline execution completed.'
         }
     }
 }
