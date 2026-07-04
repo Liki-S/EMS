@@ -6,16 +6,21 @@
 
     <groupId>com.ems</groupId>
     <artifactId>employee-management-system</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.0-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>22</maven.compiler.source>
         <maven.compiler.target>22</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  
+        <sonar.projectKey>my-project</sonar.projectKey>
+        <sonar.host.url>http://localhost:9000</sonar.host.url>
+        <sonar.login>squ_60465b9e88d2745b8c9d443c43c3a7ba80ac835f</sonar.login>
     </properties>
 
     <build>
   <plugins>
+    <!-- Assembly plugin -->
     <plugin>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-assembly-plugin</artifactId>
@@ -40,6 +45,13 @@
         </execution>
       </executions>
     </plugin>
+
+    <!-- SonarQube plugin -->
+    <plugin>
+      <groupId>org.sonarsource.scanner.maven</groupId>
+      <artifactId>sonar-maven-plugin</artifactId>
+      <version>3.9.1.2184</version>
+    </plugin>
   </plugins>
 </build>
 
@@ -53,5 +65,4 @@
     <url>http://localhost:8081/repository/maven-snapshots/</url>
   </snapshotRepository>
 </distributionManagement>
-
 </project>
