@@ -41,9 +41,11 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('MySonarQubeServer') {
-                    bat 'mvn sonar:sonar'
-                }
+                bat '''
+                mvn sonar:sonar ^
+                -Dsonar.host.url=http://localhost:9000 ^
+                -Dsonar.token=squ_60465b9e88d2745b8c9d443c43c3a7ba80ac835f
+                '''
             }
         }
     }
@@ -51,7 +53,11 @@ pipeline {
     post {
         success {
             echo '======================================='
-            echo 'Build, Nexus Deployment and SonarQube Analysis Successful!'
+            echo 'Build Successful!'
+            echo 'Tests Executed Successfully!'
+            echo 'Application Packaged Successfully!'
+            echo 'Artifacts Deployed to Nexus Successfully!'
+            echo 'SonarQube Analysis Completed Successfully!'
             echo '======================================='
         }
 
