@@ -79,7 +79,7 @@ pipeline {
             steps {
                 bat '''
                 docker rm -f ems-app || exit /b 0
-                docker run -it --name ems-app %IMAGE_NAME%
+                docker run -d --name ems-app -p 9090:8080 likith3/employee-management-system:1.0
                 '''
             }
         }
