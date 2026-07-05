@@ -6,9 +6,13 @@ pipeline {
         maven 'Maven_3.9.9'
     }
 
+    environment {
+        IMAGE_NAME = "likith3/employee-management-system:1.0"
+    }
+
     stages {
 
-        stage('Checkout') {
+        stage('Checkout Source Code') {
             steps {
                 git branch: 'main',
                     url: 'https://github.com/Liki-S/EMS.git'
@@ -21,21 +25,21 @@ pipeline {
             }
         }
 
-        stage('Test') {
+        stage('Run Unit Tests') {
             steps {
                 bat 'mvn test'
             }
         }
 
-        stage('Package') {
+        stage('Package Application') {
             steps {
                 bat 'mvn package'
             }
         }
 
-        stage('Deploy to Nexus') {
+        stage('Deploy Artifact to Nexus') {
             steps {
-                bat 'mvn -s C:\\Users\\likit\\.m2\\settings.xml clean deploy'
+                bat 'mvn -s C:\\Users\\likit\\.m2\\settings.xml deploy'
             }
         }
 
@@ -48,27 +52,65 @@ pipeline {
                 '''
             }
         }
+
+        stage('Build Docker Image') {
+            steps {
+                bat 'docker build -t %IMAGE_NAME% .'
+            }
+        }
+
+        stage('Push Docker Image to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    bat '''
+                    docker login -u %DOCKER_USER% -p %DOCKER_PASS%
+                    docker push %IMAGE_NAME%
+                    docker logout
+                    '''
+                }
+            }
+        }
+
+        stage('Run Docker Container') {
+            steps {
+                bat '''
+                docker rm -f ems-app || exit /b 0
+                docker run -it --name ems-app %IMAGE_NAME%
+                '''
+            }
+        }
     }
 
     post {
+
         success {
-            echo '======================================='
-            echo 'Build Successful!'
-            echo 'Tests Executed Successfully!'
-            echo 'Application Packaged Successfully!'
-            echo 'Artifacts Deployed to Nexus Successfully!'
-            echo 'SonarQube Analysis Completed Successfully!'
-            echo '======================================='
+            echo '==========================================='
+            echo ' Build Successful'
+            echo ' Source Code Checked Out'
+            echo ' Maven Build Completed'
+            echo ' Unit Tests Passed'
+            echo ' JAR Packaged'
+            echo ' Artifact Deployed to Nexus'
+            echo ' SonarQube Analysis Completed'
+            echo ' Docker Image Built'
+            echo ' Docker Image Pushed to Docker Hub'
+            echo ' Docker Container Started'
+            echo '==========================================='
         }
 
         failure {
-            echo '======================================='
-            echo 'Pipeline Failed! Check the Console Output.'
-            echo '======================================='
+            echo '==========================================='
+            echo ' Pipeline Failed'
+            echo ' Check Jenkins Console Output'
+            echo '==========================================='
         }
 
         always {
-            echo 'Pipeline execution completed.'
+            cleanWs()
         }
     }
 }
